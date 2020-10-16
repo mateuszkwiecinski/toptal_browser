@@ -3,10 +3,10 @@ package pl.mkwiecinski.presentation.list.ui
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
-import androidx.paging.PagedListAdapter
+import androidx.paging.LoadState
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import pl.mkwiecinski.domain.listing.entities.RepositoryInfo
-import pl.mkwiecinski.domain.listing.models.LoadingState
 import pl.mkwiecinski.presentation.R
 import pl.mkwiecinski.presentation.databinding.ItemNetworkStateBinding
 import pl.mkwiecinski.presentation.databinding.ItemRepoInfoBinding
@@ -14,9 +14,9 @@ import pl.mkwiecinski.presentation.databinding.ItemRepoInfoBinding
 internal class RepoAdapter(
     private val onRetry: () -> Unit,
     private val onItemSelected: (RepositoryInfo) -> Unit
-) : PagedListAdapter<RepositoryInfo, RepoAdapter.BindableViewHolder>(RepoDiff) {
+) : PagingDataAdapter<RepositoryInfo, RepoAdapter.BindableViewHolder>(RepoDiff) {
 
-    var networkState: LoadingState? = null
+    var networkState: LoadState? = null
         set(value) {
             val previousState = field
             val hadExtraRow = hasExtraRow()
@@ -56,7 +56,7 @@ internal class RepoAdapter(
             is BindableViewHolder.Repo -> {
                 holder.binding.model = getItem(position)
                 holder.binding.root.setOnClickListener {
-                    getItem(holder.adapterPosition)?.let(onItemSelected)
+                    getItem(holder.absoluteAdapterPosition)?.let(onItemSelected)
                 }
             }
             is BindableViewHolder.NetworkState -> {
@@ -73,7 +73,12 @@ internal class RepoAdapter(
         return super.getItemCount() + if (hasExtraRow()) 1 else 0
     }
 
-    private fun hasExtraRow() = networkState != null && networkState != LoadingState.SUCCESS
+    private fun hasExtraRow() = when (networkState) {
+        is LoadState.NotLoading -> false
+        LoadState.Loading -> true
+        is LoadState.Error -> true
+        null -> false
+    }
 
     sealed class BindableViewHolder(open val binding: ViewDataBinding) : RecyclerView.ViewHolder(binding.root) {
         data class Repo(override val binding: ItemRepoInfoBinding) : BindableViewHolder(binding)

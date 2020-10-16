@@ -1,22 +1,19 @@
 package pl.mkwiecinski.domain.listing
 
-import androidx.paging.PagedList
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import pl.mkwiecinski.domain.listing.paging.RepoDataSource
 import javax.inject.Inject
-import pl.mkwiecinski.domain.listing.models.PagingModel
-import pl.mkwiecinski.domain.listing.paging.PagingSourceFactory
-import pl.mkwiecinski.domain.listing.persistences.PagingEventsPersistence
+import javax.inject.Provider
 
-class GetPagedRepositoriesUseCase @Inject constructor(
-    private val events: PagingEventsPersistence,
-    private val factory: PagingSourceFactory
+class GetPagedRepositoriesUseCase @Inject internal constructor(
+    private val dataSourceProvider: Provider<RepoDataSource>,
 ) {
 
-    operator fun invoke(config: PagedList.Config) =
-        PagingModel(
-            factory.getPagingList(config),
-            factory::retry,
-            events.networkEvents(),
-            factory::refresh,
-            events.refreshEvents()
-        )
+    operator fun invoke(config: PagingConfig) =
+        Pager(
+            config = config,
+            pagingSourceFactory = { dataSourceProvider.get() }
+        ).flow
+
 }

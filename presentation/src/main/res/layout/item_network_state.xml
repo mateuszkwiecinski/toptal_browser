@@ -6,10 +6,10 @@
 
         <variable
             name="model"
-            type="LoadingState"
+            type="LoadState"
             />
 
-        <import type="pl.mkwiecinski.domain.listing.models.LoadingState" />
+        <import type="androidx.paging.LoadState" />
     </data>
 
     <LinearLayout
@@ -26,7 +26,7 @@
             android:padding="20dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:visibility="@{model == LoadingState.RUNNING}"
+            android:visibility="@{model instanceof LoadState.Loading}"
             />
 
         <TextView
@@ -35,7 +35,7 @@
             android:layout_gravity="center"
             android:padding="16dp"
             android:text="@string/list_loading_error"
-            android:visibility="@{model == LoadingState.FAILED}"
+            android:visibility="@{model instanceof LoadState.Error}"
             />
 
         <Button
@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/retry"
-            android:visibility="@{model == LoadingState.FAILED}"
+            android:visibility="@{model instanceof LoadState.Error}"
             />
     </LinearLayout>
 </layout>
