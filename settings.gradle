@@ -6,6 +6,7 @@ include ':app'
 include ':presentation'
 include ':domain'
 include ':data:graphql', ':data:mocked'
+include ':custom-lint-checks'
 
 enableFeaturePreview("VERSION_CATALOGS")
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

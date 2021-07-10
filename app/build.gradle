@@ -51,6 +51,8 @@ dependencies {
     implementation(projects.domain)
 
     compileOnly(libs.navigation.ui)
+
+    lintChecks(projects.customLintChecks)
 }
 
 /**
